@@ -61,7 +61,7 @@ jobs:
         CIBW_ARCHS_WINDOWS: auto ARM64
 
     - name: Verify clean directory
-      run: git diff --exit-code -- . ':!wheelhouse/'
+      run: git diff --exit-code
       shell: bash
 
     - uses: actions/upload-artifact@v4
