@@ -44,9 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
-        # os: [ubuntu-latest, macos-13, macos-latest, windows-latest]
-
+        os: [ubuntu-latest, macos-13, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -61,9 +59,9 @@ jobs:
         CIBW_ARCHS_WINDOWS: auto ARM64
 
     - name: Verify clean directory
-      run: git diff
+      run: git diff --exit-code -- . ':!wheelhouse/'
       shell: bash
-
+      
     - uses: actions/upload-artifact@v4
       with:
         name: cibw-wheels-${{ matrix.os }}
@@ -96,6 +94,6 @@ jobs:
       with:
         subject-path: "dist/*"
 
-    # - uses: pypa/gh-action-pypi-publish@release/v1
-    #   with:
-    #     attestations: true
+    - uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        attestations: true
