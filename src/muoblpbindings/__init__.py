@@ -1,1 +1,1 @@
-from .muoblpbindings import add, subtract
+from .muoblpbindings import add, subtract, equal_shares
