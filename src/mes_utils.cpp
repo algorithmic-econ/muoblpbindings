@@ -10,6 +10,14 @@
 
 using namespace std;
 
+using VoterId = string;
+using CandidateId = string;
+using Utility = double;
+using CostMap = unordered_map<CandidateId, double>;
+using BudgetMap = unordered_map<VoterId, double>;
+using ApproversMap = unordered_map<CandidateId, vector<pair<VoterId, Utility>>>;
+
+
 vector<CandidateId> break_ties(
     const vector<VoterId>& voters,
     const vector<CandidateId>& projects,
