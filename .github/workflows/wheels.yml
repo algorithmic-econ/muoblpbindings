@@ -53,12 +53,13 @@ jobs:
 
     - uses: astral-sh/setup-uv@v4
 
-    - uses: pypa/cibuildwheel@v2.22
+    - uses: pypa/cibuildwheel@v2.23
       env:
         CIBW_ENABLE: cpython-prerelease
         CIBW_ARCHS_WINDOWS: auto ARM64
         CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
           auditwheel repair -w {dest_dir} {wheel}
+        CIBW_ENVIRONMENT_LINUX: AUDITWHEEL_PLAT="manylinux_2_17_$(uname -m)"
 
     - name: Verify clean directory
       run: git diff --exit-code -- . ':!wheelhouse/'
@@ -74,7 +75,7 @@ jobs:
     name: Upload if release
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+#    if: github.event_name == 'release' && github.event.action == 'published'
     environment: pypi
     permissions:
       id-token: write
@@ -95,6 +96,10 @@ jobs:
 #      uses: actions/attest-build-provenance@v1
 #      with:
 #        subject-path: "dist/*"
+
+
+    - name: List files in dist directory
+      run: ls -al dist/
 
     - uses: pypa/gh-action-pypi-publish@release/v1
       with:
