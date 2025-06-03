@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest] #, macos-13, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-13, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -57,6 +57,8 @@ jobs:
       env:
         CIBW_ENABLE: cpython-prerelease
         CIBW_ARCHS_WINDOWS: auto ARM64
+        CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
+          auditwheel repair -w {dest_dir} {wheel}
 
     - name: Verify clean directory
       run: git diff --exit-code #-- . ':!wheelhouse/'
@@ -92,13 +94,6 @@ jobs:
     - name: List files in dist directory
       run: ls -al dist/
 
-    - name: Generate artifact attestation for sdist and wheels
-      uses: actions/attest-build-provenance@v1
-      with:
-        subject-path: "dist/*"
-
-
-
     - uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        attestations: true
+        attestations: false
