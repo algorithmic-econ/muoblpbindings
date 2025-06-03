@@ -15,3 +15,12 @@ def equal_shares_utils(voters: list[str],
     """
     Equal shares with utilities implementation
     """
+
+def equal_shares_add1(voters: list[str],
+                 projects: list[str],
+                 cost: dict[str, float],
+                 approvers_utilities: dict[str, list[tuple[str, int]]],
+                 total_budget: float) -> list[str]:
+    """
+    Equal shares with utilities implementation
+    """

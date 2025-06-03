@@ -5,7 +5,7 @@
 #include <unordered_map> // Required for std::unordered_map
 #include <utility> // Required for std::pair
 
-std::vector<std::string> equal_shares_utils(
+std::vector<std::string> equal_shares_add1(
     const std::vector<std::string>& voters,
     const std::vector<std::string>& projects,
     const std::unordered_map<std::string, double>& cost,
