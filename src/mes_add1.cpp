@@ -15,19 +15,18 @@ using namespace std;
 
 using VoterId = string;
 using CandidateId = string;
-using Utility = double;
-using CostMap = unordered_map<CandidateId, double>;
-using BudgetMap = unordered_map<VoterId, double>;
-using ApproversMap = unordered_map<CandidateId, vector<pair<VoterId, Utility>>>;
+using Utility = int;
+using Cost = double;
 
 vector<CandidateId> equal_shares_add1(
     const vector<VoterId>& voters,
     const vector<CandidateId>& projects,
-    const CostMap& cost,
-    ApproversMap approvers_utilities,
+    const unordered_map<CandidateId, Cost>& cost,
+    const unordered_map<CandidateId, vector<pair<VoterId, Utility>>>& approvals_utilities,
+    const unordered_map<CandidateId, Utility>& total_utility,
     double total_budget) {
     // Step 1: Start with a fixed budget method
-    vector<CandidateId> mes = equal_shares_utils(voters, projects, cost, approvers_utilities, total_budget);
+    vector<CandidateId> mes = equal_shares_utils(voters, projects, cost, approvals_utilities, total_utility, total_budget);
 
     // Step 2: Initialize integral per-voter budget
     double budget = static_cast<int>(total_budget / voters.size()) * voters.size();
@@ -51,7 +50,7 @@ vector<CandidateId> equal_shares_add1(
 
         // Try the next higher budget
         double next_budget = budget + voters.size();
-        vector<string> next_mes = equal_shares_utils(voters, projects, cost, approvers_utilities, next_budget);
+        vector<string> next_mes = equal_shares_utils(voters, projects, cost, approvals_utilities, total_utility, next_budget);
 
         current_cost = accumulate(next_mes.begin(), next_mes.end(), 0.0,
                                   [&cost](double sum, const string& c) { return sum + cost.at(c); });

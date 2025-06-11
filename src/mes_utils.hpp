@@ -1,13 +1,14 @@
 #pragma once
 
-#include <vector> // Required for std::vector
-#include <string> // Required for std::string
-#include <unordered_map> // Required for std::unordered_map
-#include <utility> // Required for std::pair
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
 std::vector<std::string> equal_shares_utils(
     const std::vector<std::string>& voters,
     const std::vector<std::string>& projects,
     const std::unordered_map<std::string, double>& cost,
-    std::unordered_map<std::string, std::vector<std::pair<std::string, double>>> approvers_utilities,
+    const std::unordered_map<std::string, std::vector<std::pair<std::string, int>>>& approvers_utilities,
+    const std::unordered_map<std::string, int>& total_utility,
     double total_budget);
