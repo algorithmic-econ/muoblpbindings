@@ -15,7 +15,7 @@ using namespace std;
 
 using VoterId = string;
 using CandidateId = string;
-using Utility = int;
+using Utility = long long;
 using Cost = double;
 
 CandidateId break_ties(const unordered_map<CandidateId, Cost>& cost,

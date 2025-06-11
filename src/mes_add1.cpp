@@ -15,7 +15,7 @@ using namespace std;
 
 using VoterId = string;
 using CandidateId = string;
-using Utility = int;
+using Utility = long long;
 using Cost = double;
 
 vector<CandidateId> equal_shares_add1(
