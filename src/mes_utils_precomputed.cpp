@@ -19,7 +19,7 @@ using CandidateId = string;
 using Utility = long long;
 using Cost = double;
 
-vector<CandidateId> equal_shares_utils_precomputed(
+pair<vector<CandidateId>, unordered_map<VoterId, double>> equal_shares_utils_precomputed(
     const vector<VoterId>& voters,
     const vector<CandidateId>& projects,
     const unordered_map<CandidateId, Cost>& cost,
@@ -121,5 +121,5 @@ vector<CandidateId> equal_shares_utils_precomputed(
         }
     }
 
-    return winners;
+    return {winners, budget};
 }

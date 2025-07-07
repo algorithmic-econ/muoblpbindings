@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <utility>
 
-std::vector<std::string> equal_shares_utils_precomputed(
+std::pair<std::vector<std::string>, std::unordered_map<std::string, double>> equal_shares_utils_precomputed(
     const std::vector<std::string>& voters,
     const std::vector<std::string>& projects,
     const std::unordered_map<std::string, double>& cost,

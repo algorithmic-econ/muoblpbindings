@@ -25,7 +25,7 @@ def equal_shares_utils_precomputed(voters: list[str],
                  total_utility: dict[str, int],
                  total_budget: float,
                  budget: dict[str, float],
-                 winners: list[str]) -> list[str]:
+                 winners: list[str]) -> tuple[list[str], dict[str, float]]:
     """
     Equal shares precomputed winners implementation
     """

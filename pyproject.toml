@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "muoblpbindings"
-version = "0.0.14"
+version = "0.0.15"
 readme = "README.md"
 authors = [
   { name = "Jan Sznajd", email = "jasiek.sznajd@gmail.com" },
