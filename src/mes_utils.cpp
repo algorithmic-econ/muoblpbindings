@@ -39,13 +39,13 @@ CandidateId break_ties(const unordered_map<CandidateId, Cost>& cost,
     });
     choices = vector<CandidateId>(filtered_by_utility.begin(), filtered_by_utility.end()); // Assign back to choices
 
-    if (choices.size() > 1) {
-        string tie_failed_msg = "Tie-breaking failed: ";
-        for (const auto& candidate : choices) {
-            tie_failed_msg += candidate + " ";
-        }
-        throw runtime_error(tie_failed_msg);
-    }
+//    if (choices.size() > 1) {
+//        string tie_failed_msg = "Tie-breaking failed: ";
+//        for (const auto& candidate : choices) {
+//            tie_failed_msg += candidate + " ";
+//        }
+//        throw runtime_error(tie_failed_msg);
+//    }
     return choices[0];
 }
 
