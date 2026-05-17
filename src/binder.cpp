@@ -1,12 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "mes_utils.hpp"
 #include "mes_add1.hpp"
-
-namespace py = pybind11;
+#include "mes_utils.hpp"
+#include "single_transferable_vote.hpp"
 
 PYBIND11_MODULE(muoblpbindings, m) {
-    m.def("equal_shares_utils", &equal_shares_utils);
-    m.def("equal_shares_add1", &equal_shares_add1);
+  m.def("equal_shares_add1", &equal_shares_add1);
+  m.def("equal_shares_utils", &equal_shares_utils);
+  m.def("single_transferable_vote", &single_transferable_vote);
 }

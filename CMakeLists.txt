@@ -8,21 +8,20 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# MES_UTILS
-add_library(mes_utils STATIC src/mes_utils.cpp)
-set_target_properties(mes_utils PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-# MES_ADD1
-add_library(mes_add1 STATIC src/mes_add1.cpp)
-set_target_properties(mes_add1 PROPERTIES POSITION_INDEPENDENT_CODE ON)
+add_library(methods STATIC
+  src/mes_add1.cpp
+  src/mes_utils.cpp
+  src/single_transferable_vote.cpp)
+set_target_properties(methods PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
 
+include_directories(${pybind11_INCLUDE_DIRS})
+
 python_add_library(muoblpbindings MODULE src/binder.cpp WITH_SOABI)
 target_link_libraries(muoblpbindings PRIVATE pybind11::headers)
-target_link_libraries(muoblpbindings PRIVATE mes_utils)
-target_link_libraries(muoblpbindings PRIVATE mes_add1)
+target_link_libraries(muoblpbindings PRIVATE methods)
 
 target_compile_definitions(muoblpbindings PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
