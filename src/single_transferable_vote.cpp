@@ -22,18 +22,23 @@ std::vector<std::vector<CandidateId>> get_rankings(
   if (utility.empty()) {
     return {};
   }
-  std::vector<std::vector<CandidateId>> res(utility.size(),
-                                            std::vector<CandidateId>(m));
+  std::vector<std::vector<CandidateId>> res(utility.size());
   for (size_t i = 0; i < utility.size(); i++) {
     std::vector<CandidateId>& ranking = res[i];
-    std::iota(ranking.begin(), ranking.end(), 0);
+    for (CandidateId c = 0; c < m; c++) {
+      if (utility[i][c] > 0) {
+        ranking.emplace_back(c);
+      }
+    }
     std::ranges::sort(ranking, [&](CandidateId a, CandidateId b) {
       return utility[i][a] > utility[i][b];
     });
     for (CandidateId a = 0; a + 1 < ranking.size(); a++) {
       if (utility[i][ranking[a]] <= utility[i][ranking[a + 1]]) {
         throw std::invalid_argument(
-            std::format("Objective {} does not create a strict ranking", i));
+            std::format("Objective {} does not create a strict ranking "
+                        "(candidates {} and {} are tied with utility {})",
+                        i, ranking[a], ranking[a + 1], utility[i][ranking[a]]));
       }
     }
   }
