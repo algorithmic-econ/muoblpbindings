@@ -1,12 +1,8 @@
-#include "mes_utils.hpp"
+#include "methods.hpp"
 
-#include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
 #include <algorithm>
-#include <numeric>
-#include <stdexcept>
 #include <string>
 #include <set>
 #include <ranges>
@@ -17,6 +13,8 @@ using VoterId = string;
 using CandidateId = string;
 using Utility = long long;
 using Cost = double;
+
+namespace {
 
 CandidateId break_ties(const unordered_map<CandidateId, Cost>& cost,
                        const unordered_map<CandidateId, Utility>& total_utility,
@@ -47,6 +45,8 @@ CandidateId break_ties(const unordered_map<CandidateId, Cost>& cost,
 //        throw runtime_error(tie_failed_msg);
 //    }
     return choices[0];
+}
+
 }
 
 vector<CandidateId> equal_shares_utils(
@@ -88,7 +88,7 @@ vector<CandidateId> equal_shares_utils(
         for (const auto& candidate : remaining_sorted) {
             double previous_eff_vote_count = remaining[candidate];
             if (previous_eff_vote_count < best_eff_vote_count) {
-                // Cannot be better then the best so far 
+                // Cannot be better then the best so far
                 break;
             }
 

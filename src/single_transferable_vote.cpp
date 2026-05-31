@@ -1,4 +1,4 @@
-#include "single_transferable_vote.hpp"
+#include "methods.hpp"
 
 #include <pybind11/pytypes.h>
 #include <pybind11/stl.h>
