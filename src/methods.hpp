@@ -29,4 +29,6 @@ std::vector<std::string> equal_shares_utils(
     const std::unordered_map<std::string, long long>& total_utility,
     double total_budget);
 
+std::vector<std::string> expanding_approvals(py::object lp_problem);
+
 std::vector<std::string> single_transferable_vote(py::object lp_problem);
