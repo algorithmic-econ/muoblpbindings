@@ -1,3 +1,5 @@
+from pulp import LpProblem
+
 def equal_shares_utils(voters: list[str],
                  projects: list[str],
                  cost: dict[str, float],
@@ -18,7 +20,12 @@ def equal_shares_add1(voters: list[str],
     Equal shares Add1
     """
 
-def single_transferable_vote(prob: pulp.LpProblem):
+def expanding_approvals(prob: LpProblem):
+    """
+    Expanding approvals rule
+    """
+
+def single_transferable_vote(prob: LpProblem):
     """
     Single transferable vote
     """
