@@ -9,8 +9,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_library(methods STATIC
+  src/common.cpp
   src/mes_add1.cpp
   src/mes_utils.cpp
+  src/expanding_approvals.cpp
   src/single_transferable_vote.cpp)
 set_target_properties(methods PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
