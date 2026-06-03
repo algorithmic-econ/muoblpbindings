@@ -29,3 +29,8 @@ def single_transferable_vote(prob: LpProblem):
     """
     Single transferable vote
     """
+
+def solid_coalition_refinement(prob: LpProblem):
+    """
+    Solid coalition refinement
+    """

@@ -13,7 +13,8 @@ add_library(methods STATIC
   src/mes_add1.cpp
   src/mes_utils.cpp
   src/expanding_approvals.cpp
-  src/single_transferable_vote.cpp)
+  src/single_transferable_vote.cpp
+  src/solid_coalition_refinement.cpp)
 set_target_properties(methods PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)

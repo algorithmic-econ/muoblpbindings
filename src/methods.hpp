@@ -32,3 +32,5 @@ std::vector<std::string> equal_shares_utils(
 std::vector<std::string> expanding_approvals(py::object lp_problem);
 
 std::vector<std::string> single_transferable_vote(py::object lp_problem);
+
+std::vector<std::string> solid_coalition_refinement(py::object lp_problem);
