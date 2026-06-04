@@ -3,6 +3,7 @@ dist/
 build/
 __pycache__/
 
+.clangd
 .vscode/
 .venv/
 .idea/
