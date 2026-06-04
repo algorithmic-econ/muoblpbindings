@@ -58,7 +58,7 @@ jobs:
         CIBW_ENABLE: cpython-prerelease
         CIBW_ARCHS_WINDOWS: auto ARM64
         CIBW_CONFIG_SETTINGS_WINDOWS: cmake.args=-DPYBIND11_FINDPYTHON=ON
-        CIBW_ENVIRONMENT_WINDOWS: CXXFLAGS="-DPy_GIL_DISABLED"
+        CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=14.0
         CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
           auditwheel repair -w {dest_dir} {wheel}
 
