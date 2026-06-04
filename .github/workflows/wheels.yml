@@ -55,12 +55,10 @@ jobs:
 
     - uses: pypa/cibuildwheel@v2.23
       env:
-        CIBW_BEFORE_ALL: >
-          yum install -y centos-release-scl-rh &&
-          yum install -y devtoolset-13-gcc devtoolset-13-gcc-c++
+        CIBW_BEFORE_ALL: yum install -y gcc-toolset-13-gcc gcc-toolset-13-gcc-c++
         CIBW_ENVIRONMENT: >
-          CXX=/opt/rh/devtoolset-13/root/usr/bin/g++
-          CC=/opt/rh/devtoolset-13/root/usr/bin/gcc
+          CXX=/opt/rh/gcc-toolset-13/root/usr/bin/g++
+          CC=/opt/rh/gcc-toolset-13/root/usr/bin/gcc
         CIBW_ENABLE: cpython-prerelease
         CIBW_ARCHS_WINDOWS: auto ARM64
         CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
