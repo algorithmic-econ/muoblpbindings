@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-15, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -53,17 +53,19 @@ jobs:
 
     - uses: astral-sh/setup-uv@v4
 
-    - uses: pypa/cibuildwheel@v2.23
+    - uses: pypa/cibuildwheel@v3.4.1
       env:
-        CIBW_ENABLE: cpython-prerelease
+        CIBW_BUILD: cp313-* cp314-*
         CIBW_ARCHS_WINDOWS: auto ARM64
+        CIBW_CONFIG_SETTINGS_WINDOWS: cmake.args=-DPYBIND11_FINDPYTHON=ON
+        CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=14.0
         CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
           auditwheel repair -w {dest_dir} {wheel}
 
     - name: Verify clean directory
       run: git diff --exit-code #-- . ':!wheelhouse/'
       shell: bash
-      
+
     - uses: actions/upload-artifact@v4
       with:
         name: cibw-wheels-${{ matrix.os }}
