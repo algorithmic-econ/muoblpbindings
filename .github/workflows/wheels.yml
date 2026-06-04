@@ -55,7 +55,7 @@ jobs:
 
     - uses: pypa/cibuildwheel@v3.4.1
       env:
-        CIBW_ENABLE: cpython-prerelease
+        CIBW_BUILD: cp313-* cp314-*
         CIBW_ARCHS_WINDOWS: auto ARM64
         CIBW_CONFIG_SETTINGS_WINDOWS: cmake.args=-DPYBIND11_FINDPYTHON=ON
         CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=14.0
