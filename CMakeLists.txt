@@ -19,6 +19,9 @@ set_target_properties(methods PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
+find_package(Boost REQUIRED)
+
+target_link_libraries(methods PUBLIC Boost::headers)
 
 include_directories(${pybind11_INCLUDE_DIRS})
 
