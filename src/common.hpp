@@ -19,7 +19,6 @@ struct Instance {
   std::unordered_map<std::string, CandidateId> candidate_ids;
   Cost budget;
   std::vector<Cost> candidate_costs;
-  std::vector<std::vector<Utility>> voters;
   std::vector<double> voter_weights;
 
   inline std::vector<std::string> map_names(
@@ -34,5 +33,5 @@ struct Instance {
   static Instance from_MuoblpProblem(py::object prob);
 };
 
-std::vector<std::vector<CandidateId>> get_rankings(
-    const std::vector<std::vector<Utility>>& utility, const size_t m);
+std::vector<std::vector<CandidateId>> get_rankings(const Instance& instance,
+                                                   py::object prob);

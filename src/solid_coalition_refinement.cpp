@@ -142,7 +142,7 @@ std::vector<std::string> solid_coalition_refinement(py::object prob) {
 
   const size_t m = instance.candidate_names.size();
   std::vector<CandidateId> committee =
-      solve(get_rankings(instance.voters, m), instance.voter_weights,
+      solve(get_rankings(instance, prob), instance.voter_weights,
             instance.budget, m);
 
   return instance.map_names(committee);

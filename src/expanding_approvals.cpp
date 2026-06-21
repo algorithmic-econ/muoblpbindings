@@ -8,16 +8,26 @@ namespace {
 
 using Event = std::tuple<Utility, VoterId, CandidateId>;
 
-std::vector<Event> get_events(
-    const std::vector<std::vector<Utility>>& utility) {
+std::vector<Event> get_events(const Instance& instance, py::object prob) {
   std::vector<Event> res;
-  for (VoterId i = 0; i < utility.size(); i++) {
-    for (CandidateId c = 0; c < utility[i].size(); c++) {
-      if (utility[i][c] > 0) {
-        res.emplace_back(utility[i][c], i, c);
+
+  py::list objectives = prob.attr("objectives");
+  for (size_t i = 0; i < instance.voter_weights.size(); i++) {
+    py::handle objective = objectives[i];
+    for (const auto& item : objective.cast<py::dict>()) {
+      py::object var = py::reinterpret_borrow<py::object>(item.first);
+      std::string name = var.attr("name").cast<std::string>();
+      const CandidateId candidate_id = instance.candidate_ids.at(name);
+      const Utility coeff = item.second.cast<Utility>();
+      if (coeff > 0) {
+        res.emplace_back(coeff, i, candidate_id);
+      } else if (coeff < 0) {
+        throw std::invalid_argument(
+            std::format("Objective {} has a negative coefficient", i));
       }
     }
   }
+
   std::ranges::sort(res, std::greater());
   return res;
 }
@@ -34,7 +44,7 @@ std::vector<CandidateId> solve(std::vector<Event> events,
   std::vector<bool> elected(m, false);
   std::vector<CandidateId> committee;
 
-  for (const auto& [_, i, c] : events) {
+  for (const auto& [u, i, c] : events) {
     backing_money[c] += weight[i];
     supporters_of[c].emplace_back(i);
     supported_by[i].emplace_back(c);
@@ -79,7 +89,7 @@ std::vector<std::string> expanding_approvals(py::object prob) {
                  instance.budget;
 
   std::vector<CandidateId> committee =
-      solve(get_events(instance.voters), instance.voter_weights, quota,
+      solve(get_events(instance, prob), instance.voter_weights, quota,
             instance.candidate_names.size());
 
   return instance.map_names(committee);

@@ -6,7 +6,7 @@
 Instance Instance::from_MuoblpProblem(py::object prob) {
   Instance instance;
 
-  // Create names->ids mapping
+  // Extract variable names
   py::list vars = prob.attr("variables")();
   if (vars.size() > std::numeric_limits<CandidateId>::max()) {
     throw std::invalid_argument(
@@ -62,48 +62,55 @@ Instance Instance::from_MuoblpProblem(py::object prob) {
         std::format("Too many voters. Got {} while the maximum is {}", n,
                     std::numeric_limits<VoterId>::max()));
   }
-  instance.voters.resize(n, std::vector<Utility>(m, 0));
   instance.voter_weights.resize(n, 1);
   for (size_t i = 0; i < n; i++) {
     py::handle objective = objectives[i];
     py::object voter_name = objective.attr("name");
     py::object weight = objectives_weights[voter_name];
     instance.voter_weights[i] = weight.cast<double>();
-    for (const auto& item : objective.cast<py::dict>()) {
-      py::object var = py::reinterpret_borrow<py::object>(item.first);
-      std::string name = var.attr("name").cast<std::string>();
-      const CandidateId candidate_id = instance.candidate_ids.at(name);
-      instance.voters[i][candidate_id] = item.second.cast<Utility>();
-    }
   }
 
   return instance;
 }
 
-std::vector<std::vector<CandidateId>> get_rankings(
-    const std::vector<std::vector<Utility>>& utility, const size_t m) {
-  if (utility.empty()) {
-    return {};
-  }
-  std::vector<std::vector<CandidateId>> res(utility.size());
-  for (size_t i = 0; i < utility.size(); i++) {
+std::vector<std::vector<CandidateId>> get_rankings(const Instance& instance,
+                                                   py::object prob) {
+  std::vector<std::vector<CandidateId>> res(instance.voter_weights.size());
+
+  py::list objectives = prob.attr("objectives");
+
+  for (size_t i = 0; i < res.size(); i++) {
     std::vector<CandidateId>& ranking = res[i];
-    for (CandidateId c = 0; c < m; c++) {
-      if (utility[i][c] > 0) {
-        ranking.emplace_back(c);
+    std::unordered_map<CandidateId, Utility> utility;
+
+    py::handle objective = objectives[i];
+    for (const auto& item : objective.cast<py::dict>()) {
+      py::object var = py::reinterpret_borrow<py::object>(item.first);
+      std::string name = var.attr("name").cast<std::string>();
+      const CandidateId candidate_id = instance.candidate_ids.at(name);
+      const Utility coeff = item.second.cast<Utility>();
+      if (coeff > 0) {
+        ranking.emplace_back(candidate_id);
+        utility[candidate_id] = coeff;
+      } else if (coeff < 0) {
+        throw std::invalid_argument(
+            std::format("Objective {} has a negative coefficient", i));
       }
     }
+
     std::ranges::sort(ranking, [&](CandidateId a, CandidateId b) {
-      return utility[i][a] > utility[i][b];
+      return utility[a] > utility[b];
     });
+
     for (CandidateId a = 0; a + 1 < ranking.size(); a++) {
-      if (utility[i][ranking[a]] <= utility[i][ranking[a + 1]]) {
+      if (utility[ranking[a]] <= utility[ranking[a + 1]]) {
         throw std::invalid_argument(
             std::format("Objective {} does not create a strict ranking "
                         "(candidates {} and {} are tied with utility {})",
-                        i, ranking[a], ranking[a + 1], utility[i][ranking[a]]));
+                        i, ranking[a], ranking[a + 1], utility[ranking[a]]));
       }
     }
   }
+
   return res;
 }
