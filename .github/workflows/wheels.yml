@@ -26,6 +26,9 @@ jobs:
       with:
         submodules: true
 
+    - name: Install Boost
+      run: sudo apt-get install -y libboost-dev
+
     - name: Build SDist
       run: pipx run build --sdist
 
@@ -61,6 +64,10 @@ jobs:
         CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=14.0
         CIBW_REPAIR_WHEEL_COMMAND_LINUX: >
           auditwheel repair -w {dest_dir} {wheel}
+        CIBW_BEFORE_BUILD_LINUX: >
+          yum install -y boost-devel || dnf install -y boost-devel
+        CIBW_BEFORE_BUILD_MACOS: brew install boost
+        CIBW_BEFORE_BUILD_WINDOWS: choco install boost-msvc-14.3 -y --no-progress
 
     - name: Verify clean directory
       run: git diff --exit-code #-- . ':!wheelhouse/'

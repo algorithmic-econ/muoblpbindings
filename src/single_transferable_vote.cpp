@@ -123,7 +123,7 @@ std::vector<std::string> single_transferable_vote(py::object prob) {
 
   const size_t m = instance.candidate_names.size();
   std::vector<CandidateId> committee =
-      solve(get_rankings(instance.voters, m), instance.voter_weights, quota, m);
+      solve(get_rankings(instance, prob), instance.voter_weights, quota, m);
 
   return instance.map_names(committee);
 }
