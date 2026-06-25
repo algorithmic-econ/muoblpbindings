@@ -1,34 +1,40 @@
-#include <algorithm>
 #include <format>
-#include <numeric>
-#include <ranges>
+
+#include <boost/dynamic_bitset.hpp>
 
 #include "common.hpp"
 #include "methods.hpp"
 
 namespace {
 
-using SolidCoalition = std::pair<double, std::vector<CandidateId>>;
+using bitset = boost::dynamic_bitset<>;
+using SolidCoalition = std::pair<double, bitset>;
+
+bool on_top(const std::vector<CandidateId>& ranking, const bitset& vars) {
+  const size_t r = vars.count();
+  if (ranking.size() < r) {
+    return false;
+  }
+  for (size_t i = 0; i < r; i++) {
+    if (!vars.at(ranking[i])) {
+      return false;
+    }
+  }
+  return true;
+}
 
 std::vector<SolidCoalition> get_all_coalitions(
     const std::vector<std::vector<CandidateId>>& rankings,
-    const std::vector<double>& weights) {
+    const std::vector<double>& weights, const size_t m) {
   assert(rankings.size() == weights.size());
   std::vector<SolidCoalition> res;
   for (VoterId i = 0; i < rankings.size(); i++) {
+    bitset candidates(m);
     for (size_t r = 0; r < rankings[i].size(); r++) {
-      std::unordered_set<CandidateId> candidates(rankings[i].begin(),
-                                                 rankings[i].begin() + r + 1);
+      candidates.set(rankings[i][r]);
       double weight = 0;
       for (VoterId j = 0; j < rankings.size(); j++) {
-        bool prefix_matches = true;
-        for (size_t r2 = 0; r2 <= r; r2++) {
-          if (!candidates.contains(rankings[j][r2])) {
-            prefix_matches = false;
-            break;
-          }
-        }
-        if (prefix_matches) {
+        if (on_top(rankings[j], candidates)) {
           if (j < i) {
             // This coalition has already been considered
             break;
@@ -38,89 +44,47 @@ std::vector<SolidCoalition> get_all_coalitions(
         }
       }
       if (weight > 0) {
-        std::vector<CandidateId> sorted_candidates(candidates.begin(),
-                                                   candidates.end());
-        std::ranges::sort(sorted_candidates);
-        res.emplace_back(weight, std::move(sorted_candidates));
+        res.emplace_back(weight, candidates);
       }
     }
   }
   return res;
 }
 
-template <std::ranges::input_range R1, std::ranges::input_range R2>
-size_t set_intersection_size(const R1& r1, const R2& r2) {
-  auto i1 = std::ranges::begin(r1);
-  auto i2 = std::ranges::begin(r2);
-  auto e1 = std::ranges::end(r1);
-  auto e2 = std::ranges::end(r2);
-
-  size_t res = 0;
-  while (i1 != e1 && i2 != e2) {
-    if (*i1 < *i2) {
-      ++i1;
-    } else if (*i2 < *i1) {
-      ++i2;
-    } else {
-      ++res;
-      ++i1;
-      ++i2;
-    }
-  }
-  return res;
-}
-
-std::vector<CandidateId> solve(
-    const std::vector<std::vector<CandidateId>>& rankings,
-    const std::vector<double>& weights, const size_t committee_size,
-    const size_t m) {
+bitset solve(const std::vector<std::vector<CandidateId>>& rankings,
+             const std::vector<double>& weights, const size_t committee_size,
+             const size_t m) {
   const size_t n = rankings.size();
   assert(rankings.size() == weights.size());
 
   std::vector<SolidCoalition> coalitions =
-      get_all_coalitions(rankings, weights);
-  std::vector<CandidateId> committee;         // Maintains the insertion order
-  std::vector<CandidateId> sorted_committee;  // For quicker intersections
+      get_all_coalitions(rankings, weights, m);
+  bitset committee(m);
 
-  auto underrepresentation_value =
-      [&sorted_committee](const SolidCoalition& coalition) {
-        return coalition.first /
-               (set_intersection_size(coalition.second, sorted_committee) + 1);
-      };
-
-  std::vector<CandidateId> all_candidates(m);
-  std::iota(all_candidates.begin(), all_candidates.end(), 0);
+  bitset all_candidates(m);
+  all_candidates.set();
 
   for (size_t k = 0; k < committee_size; k++) {
-    std::vector<CandidateId> const* curr = &all_candidates;
-    while (curr->size() - set_intersection_size(*curr, sorted_committee) > 1) {
+    bitset const* curr = &all_candidates;
+    while ((*curr & (~committee)).count() > 1) {
       double best_value = 0;
-      std::vector<CandidateId> const* best = nullptr;
-      for (const SolidCoalition& coalition : coalitions) {
-        if (coalition.second.size() >= curr->size() ||
-            set_intersection_size(coalition.second, *curr) <
-                coalition.second.size() ||
-            set_intersection_size(coalition.second, sorted_committee) ==
-                coalition.second.size()) {
+      bitset const* best = nullptr;
+      for (const auto& [weight, candidates] : coalitions) {
+        if (!candidates.is_proper_subset_of(*curr) ||
+            candidates.is_subset_of(committee)) {
           continue;
         }
-        double value = underrepresentation_value(coalition);
+        double value = weight / ((candidates & committee).count() + 1);
         if (value > best_value) {
           best_value = value;
-          best = &coalition.second;
+          best = &candidates;
         }
       }
       assert(best_value > 0);
       curr = best;
     }
 
-    for (const CandidateId& c : *curr) {
-      auto it = std::ranges::lower_bound(sorted_committee, c);
-      if (it == sorted_committee.end() || *it != c) {
-        sorted_committee.emplace(it, c);
-        committee.emplace_back(c);
-      }
-    }
+    committee |= *curr;
   }
 
   return committee;
@@ -141,9 +105,8 @@ std::vector<std::string> solid_coalition_refinement(py::object prob) {
   }
 
   const size_t m = instance.candidate_names.size();
-  std::vector<CandidateId> committee =
-      solve(get_rankings(instance, prob), instance.voter_weights,
-            instance.budget, m);
+  bitset committee = solve(get_rankings(instance, prob), instance.voter_weights,
+                           instance.budget, m);
 
   return instance.map_names(committee);
 }

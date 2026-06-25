@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <boost/dynamic_bitset.hpp>
+
 namespace py = pybind11;
 
 using VoterId = uint32_t;
@@ -26,6 +28,16 @@ struct Instance {
     std::vector<std::string> res(ids.size());
     for (size_t i = 0; i < ids.size(); i++) {
       res[i] = this->candidate_names[ids[i]];
+    }
+    return res;
+  }
+
+  inline std::vector<std::string> map_names(const boost::dynamic_bitset<>& bitset) {
+    std::vector<std::string> res;
+    for (CandidateId i = 0; i < candidate_names.size(); i++) {
+      if (bitset.at(i)) {
+        res.emplace_back(candidate_names[i]);
+      }
     }
     return res;
   }
